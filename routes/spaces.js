@@ -5,7 +5,6 @@ const Space = require('../models/spaces');
 const User = require('../models/users');
 const { checkBody } = require('../modules/checkBody');
 
-
 /* GET spaces listing. */
 router.get('/', function(req, res) {
   Space.find({}).then(data => {
@@ -22,7 +21,6 @@ router.get('/:id', function(req, res) {
 	.catch(error => {
 	res.json({ result: false, error: error.message });
 	});
-	
 });
 
 /* POST create new space */
@@ -65,7 +63,6 @@ router.post('/update', (req, res) => {
 	Space.updateOne( {_id: req.body._id}, update )
 	.then( data => res.json({ result: true, data }) )
 });
-
 
 /* POST delete space */
 router.post('/trash', (req, res) => {

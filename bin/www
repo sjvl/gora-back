@@ -21,6 +21,44 @@ app.set('port', port);
 
 var server = http.createServer(app);
 
+
+/**
+ * Socket.IO.
+ */
+var socketIo = require('socket.io');
+var io = require('socket.io')(server, {
+  cors: {
+    origin: 'http://localhost:3001',
+    methods: ['GET', 'POST'],
+    credentials: true
+  }
+});
+
+// Gestion des connexions WebSocket
+io.on('connection', (socket) => {
+  console.log(socket.id, 'is connected');
+
+  // Join a room when a client connects
+  socket.on('join', (spaceId) => {
+    socket.join(spaceId);
+    console.log(socket.id, 'join the room', spaceId)
+    // Émettre un événement personnalisé pour informer les clients de l'entrée d'un nouveau membre
+    socket.to(spaceId).emit('join', socket.id);
+  });
+
+  // When a client sends data
+  socket.on('data', (data) => {
+    // Emit data to all clients in the room except the sender
+    socket.to(data.room).emit('data', data);
+  });
+
+  // Gestion de la déconnexion
+  socket.on('disconnect', () => {
+    console.log(socket.id, 'is deconnected');
+  });
+});
+
+
 /**
  * Listen on provided port, on all network interfaces.
  */

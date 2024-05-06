@@ -17,6 +17,7 @@
     "mongoose": "^8.3.1",
     "morgan": "~1.9.1",
     "node-fetch": "2",
+    "socket.io": "^4.7.5",
     "uid2": "^1.0.0",
     "uniqid": "^5.4.0"
   }
