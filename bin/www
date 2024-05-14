@@ -28,8 +28,8 @@ var server = http.createServer(app);
 var socketIo = require('socket.io');
 var io = require('socket.io')(server, {
   cors: {
-    // origin: 'http://localhost:3001',
-    origin: 'https://gora-iota.vercel.app',
+    origin: ['http://localhost:3001', 'https://gora-iota.vercel.app'],
+    // origin: 'https://gora-iota.vercel.app',
     methods: ['GET', 'POST'],
     credentials: true
   }
