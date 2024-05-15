@@ -36,52 +36,53 @@ var io = require('socket.io')(server, {
 });
 
 // Gestion des connexions WebSocket
+let rooms = {}; // Stocker les données des joueurs par room
 
-let state = []
 io.on('connection', (socket) => {
   console.log(socket.id, 'is connected');
 
-  // Join a room when a client connects
+  // Connexion à une room
   socket.on('join', (spaceId) => {
     socket.join(spaceId);
     console.log(socket.id, 'join the room', spaceId)
 
     // Envoyer les données des joueurs au nouveau
-    const otherPlayers = state.filter(e => e.id !== socket.id);
-    // console.log('otherplayers', otherPlayers)
-    socket.emit('otherPlayers', otherPlayers);
+    const otherPlayers = rooms[spaceId] ? rooms[spaceId].filter(e => e.id !== socket.id) : [];
+    if(otherPlayers.length) socket.emit('otherPlayers', otherPlayers);
+    // Créer le tableau pour la room si elle n'existe pas déjà
+    if (!rooms[spaceId]) {
+      rooms[spaceId] = [];
+    }
 
-    // Émettre un événement personnalisé pour informer les clients de l'entrée d'un nouveau membre
+    // Émettre un événement personnalisé pour informer les joueurs de l'entrée d'un nouveau
     socket.to(spaceId).emit('join', socket.id);
   });
 
- 
-
-  // When a client sends data
+  // Quand un joueur envoie ses données
   socket.on('data', (data) => {
-    // Emit data to all clients in the room except the sender
+    // Envoyer cette data à tous les autres
     socket.to(data.room).emit('data', data);
 
-    //store data on backend
-    let tmp = state.findIndex(e => e.id === data.id)
+    // Store data on backend
+    let roomData = rooms[data.room];
+    let tmp = roomData.findIndex(e => e.id === data.id)
     if(tmp < 0){
-      state.push(data)
-    }else {
-      state[tmp] = data
+      roomData.push(data)
+    } else {
+      roomData[tmp] = data
     }
-    // console.log(state)
   });
 
   // Gestion de la déconnexion
   socket.on('disconnect', () => {
-
-    // remove data from backend
-    let tmp = state.findIndex(e => e.id === socket.id)
-    if(tmp > -1){
-      socket.to(state[tmp].room).emit('remove', state[tmp].id);
-      state.splice(tmp, 1)
+    // Remove data from backend
+    for (let room in rooms) {
+      let tmp = rooms[room].findIndex(e => e.id === socket.id)
+      if(tmp > -1){
+        socket.to(room).emit('remove', rooms[room][tmp].id);
+        rooms[room].splice(tmp, 1)
+      }
     }
-    // console.log(state)
     console.log(socket.id, 'is disconnected');
   });
 });
