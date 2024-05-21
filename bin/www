@@ -58,6 +58,12 @@ io.on('connection', (socket) => {
     socket.to(spaceId).emit('join', socket.id);
   });
 
+  //webRTC
+  socket.on('signal', (data) => {
+    console.log('signal', data)
+    io.to(data.room).emit('signal', data);
+  });
+
   // Quand un joueur envoie ses données
   socket.on('data', (data) => {
     // Envoyer cette data à tous les autres
