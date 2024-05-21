@@ -60,7 +60,6 @@ io.on('connection', (socket) => {
 
   //webRTC
   socket.on('signal', (data) => {
-    console.log('signal', data)
     io.to(data.room).emit('signal', data);
   });
 
