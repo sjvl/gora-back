@@ -67,6 +67,7 @@ io.on('connection', (socket) => {
   socket.on('mediaState', ({ room, video, audio }) => {
     socket.to(room).emit('mediaState', { video, audio });
   });
+  
 
   // Quand un joueur envoie ses données
   socket.on('data', (data) => {
